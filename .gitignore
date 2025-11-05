@@ -16,7 +16,7 @@ data/
 .DS_Store
 Thumbs.db
 
-# Ignore all PNG images
+# Ignore all images
 *.png
 *.jpg
 
