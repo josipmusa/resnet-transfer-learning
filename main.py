@@ -175,17 +175,23 @@ def _visualize_predictions(model, val_loader, class_names):
     print(f"Saved prediction samples to {predictions_path}")
 
 def main():
+    print(f"Using device: {device}")
     model = models.resnet18(weights=ResNet18_Weights.DEFAULT)
-    #Freeze all layers
-    for param in model.parameters():
-        param.requires_grad = False
-    num_classes = 2 #Cat/Dog
+    #Cat/Dog
+    num_classes = 2
     model.fc = nn.Linear(model.fc.in_features, num_classes)
-    model.to(device)
-
     train_loader, val_loader, class_names = _load_training_data()
-    _train_model(model, train_loader, val_loader)
+    if model_path.exists():
+        model.load_state_dict(torch.load(model_path, map_location=device))
+    else:
+        # Freeze all layers
+        for param in model.parameters():
+            param.requires_grad = False
+        model.to(device)
+        _train_model(model, train_loader, val_loader)
 
+
+    model.to(device)
     predictions, labels = _predict(model, val_loader)
     accuracy = (predictions == labels).float().mean().item()
     print(f"Accuracy: {accuracy:.4f}")
